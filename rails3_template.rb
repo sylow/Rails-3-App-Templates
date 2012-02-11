@@ -82,28 +82,9 @@ end
 
 say_wizard "Checking configuration. Please confirm your preferences."
 
-# >====
+# >------------------------[ Get default Gemfile ]---------------------------------<
 
-get "https://github.com/fortuity/rails-template-recipes/raw/master/sample_readme.txt", "README"
-
-# >---------------------------------[ HAML ]----------------------------------<
-
-@current_recipe = "slim"
-@before_configs["slim"].call if @before_configs["slim"]
-say_recipe 'slim'
-
-config = {}
-config['slim'] = yes_wizard?("Would you like to use Slim instead of ERB?") if true && true unless config.key?('slim')
-@configs[@current_recipe] = config
-
-# Application template recipe for the rails3_devise_wizard. Check for a newer version here:
-# https://github.com/fortuity/rails3_devise_wizard/blob/master/recipes/haml.rb
-
-if config['slim']
-  gem 'slim-rails', '>= 3.1.1'
-else
-  recipes.delete('haml')
-end
+get "https://raw.github.com/sylow/Rails-3-App-Templates/master/Gemfile", "Gemfile"
 
 
 # >---------------------------------[ AUTHLOGIC ]----------------------------------<
@@ -126,58 +107,23 @@ end
 
 # >---------------------------------[ RSpec ]---------------------------------<
 
-@current_recipe = "rspec"
-@before_configs["rspec"].call if @before_configs["rspec"]
-say_recipe 'RSpec'
+after_bundler do
+  say_wizard "RSpec recipe running 'after bundler'"
+  generate 'rspec:install'
 
-config = {}
-config['rspec'] = true #yes_wizard?("Would you like to use RSpec instead of TestUnit?") if true && true unless config.key?('rspec')
-config['factory_girl'] = true #yes_wizard?("Would you like to use factory_girl for test fixtures with RSpec?") if true && true unless config.key?('factory_girl')
-@configs[@current_recipe] = config
+  say_wizard "Removing test folder (not needed for RSpec)"
+  run 'rm -rf test/'
 
-# Application template recipe for the rails3_devise_wizard. Check for a newer version here:
-# https://github.com/fortuity/rails3_devise_wizard/blob/master/recipes/rspec.rb
+  inject_into_file 'config/application.rb', :after => "Rails::Application\n" do
+    <<-RUBY
 
-if config['rspec']
-  say_wizard "REMINDER: When creating a Rails app using RSpec..."
-  say_wizard "you should add the '-T' flag to 'rails new'"
-  gem 'rb-fsevent', :group => :test
-  gem 'growl', :group => :test
-  gem 'rspec-rails', :group => [:development, :test]
-  if config['factory_girl']
-    # use the factory_girl gem for test fixtures
-    gem 'factory_girl_rails', :group => :test
-
-
-    gem 'database_cleaner', :group => :test
-    gem 'guard-rspec', :group => :test
-    gem 'spork', :group => :test
+  # don't generate RSpec tests for views and helpers
+  config.generators do |g|
+    g.view_specs false
+    g.helper_specs false
   end
-else
-  recipes.delete('rspec')
-end
 
-# note: there is no need to specify the RSpec generator in the config/application.rb file
-
-if config['rspec']
-  after_bundler do
-    say_wizard "RSpec recipe running 'after bundler'"
-    generate 'rspec:install'
-
-    say_wizard "Removing test folder (not needed for RSpec)"
-    run 'rm -rf test/'
-
-    inject_into_file 'config/application.rb', :after => "Rails::Application\n" do
-      <<-RUBY
-
-    # don't generate RSpec tests for views and helpers
-    config.generators do |g|
-      g.view_specs false
-      g.helper_specs false
-    end
-
-      RUBY
-    end
+    RUBY
   end
 end
 

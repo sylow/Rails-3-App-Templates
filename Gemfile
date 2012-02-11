@@ -10,6 +10,8 @@ gem 'will_paginate'
 gem 'slim'
 gem 'haml'
 gem 'carrierwave'
+gem 'jquery-rails'
+gem 'capistrano'
 
 group :assets do
   gem 'less-rails-bootstrap'
@@ -21,8 +23,12 @@ group :assets do
   gem 'uglifier'
 end
 
-gem 'jquery-rails'
-
-
-# Deploy with Capistrano
-gem 'capistrano'
+group :test do
+  gem 'rb-fsevent'
+  gem 'growl'
+  gem 'rspec-rails'
+  gem 'factory_girl_rails'
+  gem 'database_cleaner'
+  gem 'guard-rspec'
+  gem 'spork'
+end
