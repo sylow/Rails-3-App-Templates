@@ -5,7 +5,7 @@ Rails.application.config.generators do |g|
 end
 RUBY
 
-@recipes = [ "slim", "rspec", "authlogic", "seed_database", "cleanup", "ban_spiders", "git"]
+@recipes = [ "slim", "rspec", "cleanup", "git"]
 
 def recipes;
   @recipes
@@ -86,25 +86,11 @@ say_wizard "Checking configuration. Please confirm your preferences."
 
 get "https://raw.github.com/sylow/Rails-3-App-Templates/master/Gemfile", "Gemfile"
 
-
-# >---------------------------------[ AUTHLOGIC ]----------------------------------<
-
-@current_recipe = "authlogic"
-@before_configs["authlogic"].call if @before_configs["authlogic"]
-say_recipe 'authlogic'
-
-config = {}
-config['authlogic'] = yes_wizard?("Would you like to use authlogic?") if true && true unless config.key?('authlogic')
-@configs[@current_recipe] = config
-
-
-if config['authlogic']
-  gem 'authlogic'
-  gem 'acl9'
-else
-  recipes.delete('authlogic')
+# >---------- set up databases
+after_bundler do
+  say_wizard "Create database"
+  run "bundle exec rake db:create"
 end
-
 # >---------------------------------[ RSpec ]---------------------------------<
 
 after_bundler do
@@ -143,35 +129,10 @@ after_bundler do
 
   say_wizard "ApplicationLayout recipe running 'after bundler'"
 
-  # Set up the default application layout
-  if recipes.include? 'slim'
-    remove_file 'app/views/layouts/application.html.erb'
-    # There is Haml code in this script. Changing the indentation is perilous between HAMLs.
-    create_file 'app/views/layouts/application.html.slim' do
-      <<-SLIM
-doctype html
-html
-  head
-    title Application
-    meta name="keywords" content="new app"
+  #adding layout
+  run 'bundle exec rails generate bootstrap:layout application fixed --slim'
 
-  body
-    div id="content" class="example1"
-      p Nest by indentation
-
-      == yield
-
-    div id="footer"
-      | Copyright © 2012 sylow
-
-      SLIM
-    end
-  end
 end
-
-# >--------------------------------[ Twitter Bootstrap ]----------------------<
-
-gem 'twitter-bootstrap-rails'
 
 
 # >--------------------------------[ Cleanup ]--------------------------------<
@@ -211,32 +172,6 @@ after_bundler do
 
 end
 
-
-# >------------------------------[ BanSpiders ]-------------------------------<
-
-@current_recipe = "ban_spiders"
-@before_configs["ban_spiders"].call if @before_configs["ban_spiders"]
-say_recipe 'BanSpiders'
-
-config = {}
-config['ban_spiders'] = yes_wizard?("Would you like to set a robots.txt file to ban spiders?") if true && true unless config.key?('ban_spiders')
-@configs[@current_recipe] = config
-
-# Application template recipe for the rails3_devise_wizard. Check for a newer version here:
-# https://github.com/fortuity/rails3_devise_wizard/blob/master/recipes/ban_spiders.rb
-
-if config['ban_spiders']
-  say_wizard "BanSpiders recipe running 'after bundler'"
-  after_bundler do
-    # ban spiders from your site by changing robots.txt
-    gsub_file 'public/robots.txt', /# User-Agent/, 'User-Agent'
-    gsub_file 'public/robots.txt', /# Disallow/, 'Disallow'
-  end
-else
-  recipes.delete('ban_spiders')
-end
-
-
 # >----------------------------------[ Git ]----------------------------------<
 
 @current_recipe = "git"
@@ -257,15 +192,10 @@ after_everything do
   remove_file '.gitignore'
   get "https://github.com/fortuity/rails3-gitignore/raw/master/gitignore.txt", ".gitignore"
 
-
   # Initialize new Git repo
   git :init
   git :add => '.'
   git :commit => "-aqm 'new Rails app initialized'"
-  # Create a git branch
-  git :checkout => ' -b working_branch'
-  git :add => '.'
-  git :commit => "-m 'Initial commit of working_branch'"
 end
 
 

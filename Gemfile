@@ -12,10 +12,7 @@ gem 'haml'
 gem 'carrierwave'
 gem 'jquery-rails'
 gem 'capistrano'
-
-group :assets do
-  gem 'less-rails-bootstrap'
-end
+gem 'twitter-bootstrap-rails'
 
 group :assets do
   gem 'sass-rails'

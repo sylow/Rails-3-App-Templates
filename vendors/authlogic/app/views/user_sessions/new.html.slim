@@ -1,0 +1,14 @@
+div
+  =form_for @user_session, :remote =>true do |f|  
+    fieldset 
+      legend Login
+      .clearfix
+        label Login
+        .input
+          = f.text_field :login
+      .clearfix
+        label Password
+        .input
+          = f.password_field :password
+      .actions
+        = f.submit "Submit", :class=> "btn success"

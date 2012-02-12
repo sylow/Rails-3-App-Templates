@@ -1,0 +1,23 @@
+=form_for @user do |f|
+  fieldset
+    legend Registeration
+    .clearfix
+      label Username
+      .input
+        = f.text_field :login
+    .clearfix
+      label Email
+      .input
+        = f.text_field :email
+    .clearfix
+      label Password
+      .input
+        = f.text_field :password
+    .clearfix
+      label Password confirmation
+      .input
+        = f.text_field :password_confirmation
+    .actions
+      a href="#" class="btn" Cancel
+
+      a href="#" class="btn success" Submit
