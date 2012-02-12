@@ -121,7 +121,7 @@ end
   get "https://raw.github.com/sylow/Rails-3-App-Templates/master/vendors/app/#{file}", "app/#{file}"
 end
 
-%w(db/migrations/create_users.rb).each do |file|
+%w(db/migrate/20100414115528_create_users.rb).each do |file|
   get "https://raw.github.com/sylow/Rails-3-App-Templates/master/vendors/#{file}", "#{file}"
 end
 
