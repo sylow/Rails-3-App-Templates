@@ -91,6 +91,14 @@ after_bundler do
   say_wizard "Create database"
   run "bundle exec rake db:create"
 end
+
+# >---------- authlogic files
+%w(controllers/user_sessions_controller.rb controllers/users_controller.rb
+   models/user.rb models/user_session.rb
+   views/user_sessions/new.html.slim views/user_sessions/new.html.slim views/users/new.html.slim
+   ).each do |file|
+  get "https://raw.github.com/sylow/Rails-3-App-Templates/master/vendors/authlogic/app/#{file}", "app/#{file}"
+end
 # >---------------------------------[ RSpec ]---------------------------------<
 
 after_bundler do
