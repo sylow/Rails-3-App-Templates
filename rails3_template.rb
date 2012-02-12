@@ -84,7 +84,28 @@ say_wizard "Checking configuration. Please confirm your preferences."
 
 # >------------------------[ Get default Gemfile ]---------------------------------<
 
-get "https://raw.github.com/sylow/Rails-3-App-Templates/master/Gemfile", "Gemfile"
+gem 'rails', :version => '3.2.1'
+gem 'mysql2'
+gem 'json'
+gem 'authlogic'
+gem 'acl9'
+gem 'will_paginate'
+gem 'slim-rails'
+gem 'haml'
+gem 'carrierwave'
+gem 'jquery-rails'
+gem 'capistrano'
+gem 'twitter-bootstrap-rails'
+
+gem_group :development, :test do
+  gem 'rb-fsevent'
+  gem 'growl'
+  gem 'rspec-rails'
+  gem 'factory_girl_rails'
+  gem 'database_cleaner'
+  gem 'guard-rspec'
+  gem 'spork'
+end
 
 # >---------- set up databases
 after_bundler do
@@ -92,13 +113,18 @@ after_bundler do
   run "bundle exec rake db:create"
 end
 
-# >---------- authlogic files
+# >---------- template files
 %w(controllers/user_sessions_controller.rb controllers/users_controller.rb
    models/user.rb models/user_session.rb
    views/user_sessions/new.html.slim views/user_sessions/new.html.slim views/users/new.html.slim
    ).each do |file|
-  get "https://raw.github.com/sylow/Rails-3-App-Templates/master/vendors/authlogic/app/#{file}", "app/#{file}"
+  get "https://raw.github.com/sylow/Rails-3-App-Templates/master/vendors/app/#{file}", "app/#{file}"
 end
+
+%w(db/migrations/create_users.rb).each do |file|
+  get "https://raw.github.com/sylow/Rails-3-App-Templates/master/vendors/#{file}", "#{file}"
+end
+
 # >---------------------------------[ RSpec ]---------------------------------<
 
 after_bundler do
@@ -137,11 +163,19 @@ after_bundler do
 
   say_wizard "ApplicationLayout recipe running 'after bundler'"
 
+  #install bootstrap
+  run 'bundle exec rails g bootstrap:install'
+
   #adding layout
   run 'bundle exec rails generate bootstrap:layout application fixed --slim'
 
+  #
+  run 'bundle exec rake db:migrate'
 end
 
+# >------Routes
+route("resources :users")
+route("resources :user_sessions")
 
 # >--------------------------------[ Cleanup ]--------------------------------<
 
@@ -165,6 +199,7 @@ after_bundler do
     doc/README_FOR_APP
     public/index.html
     public/images/rails.png
+    app/views/layout/application.html.erb
   }.each { |file| remove_file file }
 
   # add placeholder READMEs
