@@ -114,7 +114,7 @@ after_bundler do
 end
 
 # >---------- template files
-%w(controllers/user_sessions_controller.rb controllers/users_controller.rb
+%w(controllers/user_sessions_controller.rb controllers/users_controller.rb controllers/application_controller.rb
    models/user.rb models/user_session.rb
    views/user_sessions/new.html.slim views/user_sessions/new.html.slim views/users/new.html.slim
    ).each do |file|
